@@ -1,17 +1,27 @@
 package ido
 
 import (
-	"errors"
+	"fmt"
 	"os/exec"
 	"strings"
 )
 
-func Create(image string) (string, error) {
-	b, err := exec.Command("docker", "create", image).CombinedOutput()
-	output := strings.TrimSpace(string(b))
+func command(name string, arg ...string) (result string, err error) {
+	b, err := exec.Command(name, arg...).CombinedOutput()
+	result = strings.TrimSpace(string(b))
 	if err != nil {
-		return "", errors.New(output)
+		words := append([]string{name}, arg[0:]...)
+		return "", fmt.Errorf("%s: %s", strings.Join(words, " "), result)
 	}
 
-	return output, nil
+	return result, nil
+}
+
+func Create(image string) (string, error) {
+	result, err := command("docker", "create", image)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
 }
