@@ -10,13 +10,12 @@ import (
 
 const exitCodeNG = 1
 
-var version string
-
 func main() {
 	app := cli.NewApp()
 	app.Name = "ido"
-	app.Version = version
+	app.Version = ido.Version()
 	app.Usage = ""
+	app.Description = fmt.Sprintf("REVISION: %s", ido.Revision())
 	app.Authors = []cli.Author{
 		{
 			Name:  "Shingo Kawamura",
