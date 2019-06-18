@@ -25,3 +25,12 @@ func Create(image string) (string, error) {
 
 	return result, nil
 }
+
+func Export(container string, output string) (string, error) {
+	result, err := command("docker", "export", "-o", output, container)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
