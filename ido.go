@@ -55,3 +55,12 @@ func TarX(dir string, file string) (string, error) {
 
 	return result, nil
 }
+
+func Chroot(dir string, cmd string) (string, error) {
+	result, err := command("chroot", dir, cmd)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
