@@ -26,6 +26,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		runCommand,
+		attachCommand,
 	}
 
 	err := app.Run(os.Args)

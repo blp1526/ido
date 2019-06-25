@@ -5,14 +5,14 @@ import (
 	"github.com/urfave/cli"
 )
 
-var runCommand = cli.Command{
-	Name:      "run",
-	Usage:     "runs a container",
-	ArgsUsage: "[image]",
+var attachCommand = cli.Command{
+	Name:      "attach",
+	Usage:     "attaches to a container",
+	ArgsUsage: "[pid]",
 	Action: func(c *cli.Context) (err error) {
-		image := c.Args().First()
-		if image == "" {
-			err := cli.ShowCommandHelp(c, "run")
+		pid := c.Args().First()
+		if pid == "" {
+			err := cli.ShowCommandHelp(c, "attach")
 			if err != nil {
 				return cli.NewExitError(err, exitCodeNG)
 			}
@@ -20,7 +20,7 @@ var runCommand = cli.Command{
 			return nil
 		}
 
-		err = ido.Run(image)
+		err = ido.Attach(pid)
 		if err != nil {
 			return cli.NewExitError(err, exitCodeNG)
 		}
