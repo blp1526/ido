@@ -3,16 +3,17 @@ package ido
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
-func Run() error {
+func Run(image string) error {
 	wd := filepath.Join("/tmp", "tmp")
 	rootfsDir, err := MkRootfs(wd)
 	if err != nil {
 		return err
 	}
 
-	result, err := Create("busybox")
+	result, err := Create(image)
 	if err != nil {
 		return err
 	}
@@ -28,6 +29,15 @@ func Run() error {
 	}
 
 	_, err = Chroot(rootfsDir, "/bin/sh")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Attach(pid string) error {
+	_, err := strconv.Atoi(pid)
 	if err != nil {
 		return err
 	}
