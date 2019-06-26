@@ -25,6 +25,7 @@ func main() {
 	app.Copyright = "(c) 2019 Shingo Kawamura"
 
 	app.Commands = []cli.Command{
+		createCommand,
 		runCommand,
 		attachCommand,
 	}
