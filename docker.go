@@ -1,19 +1,25 @@
 package ido
 
-func Create(image string) (string, error) {
-	result, err := command("docker", "create", image)
-	if err != nil {
-		return "", err
-	}
+type docker struct{}
 
-	return result, nil
+func newDocker() *docker {
+	return &docker{}
 }
 
-func Export(container string, output string) (string, error) {
-	result, err := command("docker", "export", "-o", output, container)
+func (d docker) create(image string) (container string, err error) {
+	container, err = command("docker", "create", image)
 	if err != nil {
 		return "", err
 	}
 
-	return result, nil
+	return container, nil
+}
+
+func (d docker) export(outputDir string, container string) (err error) {
+	_, err = command("docker", "export", "-o", outputDir, container)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
