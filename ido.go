@@ -35,6 +35,11 @@ func Create(image string) error {
 		return err
 	}
 
+	err = os.Remove(outputDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
