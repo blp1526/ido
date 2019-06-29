@@ -7,7 +7,8 @@ func newDocker() *docker {
 }
 
 func (d docker) create(image string) (container string, err error) {
-	container, err = command("docker", "create", image)
+	sh := newShell("docker", "create", image)
+	container, err = sh.result()
 	if err != nil {
 		return "", err
 	}
@@ -16,7 +17,8 @@ func (d docker) create(image string) (container string, err error) {
 }
 
 func (d docker) export(outputDir string, container string) (err error) {
-	_, err = command("docker", "export", "-o", outputDir, container)
+	sh := newShell("docker", "export", "-o", outputDir, container)
+	err = sh.run()
 	if err != nil {
 		return err
 	}

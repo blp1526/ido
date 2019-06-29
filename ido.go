@@ -50,7 +50,7 @@ func Run(cmd string) error {
 	}
 
 	rootfsDir := filepath.Join(wd, "rootfs")
-	err = chroot(rootfsDir, "/bin/sh")
+	err = unshareChroot(rootfsDir, cmd)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,8 @@ func mkRootfsDir(dir string) (rootfsDir string, err error) {
 }
 
 func tarX(dir string, file string) (err error) {
-	_, err = command("tar", "-C", dir, "-xvf", file)
+	sh := newShell("tar", "-C", dir, "-xvf", file)
+	err = sh.run()
 	if err != nil {
 		return err
 	}
@@ -86,8 +87,13 @@ func tarX(dir string, file string) (err error) {
 	return nil
 }
 
-func chroot(dir string, cmd string) (err error) {
-	_, err = command("chroot", dir, cmd)
+func unshareChroot(dir string, cmd string) (err error) {
+	sh := newShell("unshare", "--pid", "--fork", "chroot", dir, cmd)
+	sh.cmd.Stdout = os.Stdout
+	sh.cmd.Stdin = os.Stdin
+	sh.cmd.Stderr = os.Stderr
+
+	err = sh.run()
 	if err != nil {
 		return err
 	}
