@@ -8,10 +8,10 @@ import (
 var runCommand = cli.Command{
 	Name:      "run",
 	Usage:     "runs a container",
-	ArgsUsage: "[image]",
+	ArgsUsage: "[command]",
 	Action: func(c *cli.Context) (err error) {
-		image := c.Args().First()
-		if image == "" {
+		cmd := c.Args().First()
+		if cmd == "" {
 			err := cli.ShowCommandHelp(c, "run")
 			if err != nil {
 				return cli.NewExitError(err, exitCodeNG)
@@ -20,7 +20,7 @@ var runCommand = cli.Command{
 			return nil
 		}
 
-		err = ido.Run(image)
+		err = ido.Run(cmd)
 		if err != nil {
 			return cli.NewExitError(err, exitCodeNG)
 		}
