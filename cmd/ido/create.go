@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/blp1526/ido"
 	"github.com/urfave/cli"
 )
@@ -20,11 +22,12 @@ var createCommand = cli.Command{
 			return nil
 		}
 
-		err = ido.Create(image)
+		tempDir, err := ido.Create(image)
 		if err != nil {
 			return cli.NewExitError(err, exitCodeNG)
 		}
 
+		fmt.Println(tempDir)
 		return nil
 	},
 }
