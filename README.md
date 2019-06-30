@@ -1,6 +1,14 @@
 # ido
 
-## Installation
+## Required commands
+
+* chroot
+* unshare
+* tar
+* docker
+  * only `docker create` and `docker export`
+
+## Build
 
 ```
 $ make

@@ -1,46 +1,46 @@
 package ido
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
-func Create(image string) error {
-	wd, err := os.Getwd()
+func Create(image string) (tempDir string, err error) {
+	tempDir, err = ioutil.TempDir("", "")
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	rootfsDir, err := mkRootfsDir(wd)
+	rootfsDir, err := mkRootfsDir(tempDir)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	d := newDocker()
-
 	container, err := d.create(image)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	outputDir := filepath.Join(wd, "tmp.tar")
-	err = d.export(outputDir, container)
+	tempFilePath := filepath.Join(tempDir, "temp.tar")
+	err = d.export(tempFilePath, container)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = tarX(rootfsDir, outputDir)
+	err = tarX(rootfsDir, tempFilePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = os.Remove(outputDir)
+	err = os.Remove(tempFilePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return tempDir, nil
 }
 
 func Run(cmd string) error {
