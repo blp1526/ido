@@ -29,6 +29,10 @@ func Create(image string) (tempDir string, err error) {
 	if err != nil {
 		return "", err
 	}
+	err = d.rm(container)
+	if err != nil {
+		return "", err
+	}
 
 	err = tarX(rootfsDir, tempFilePath)
 	if err != nil {

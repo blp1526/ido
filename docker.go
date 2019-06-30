@@ -25,3 +25,13 @@ func (d docker) export(outputDir string, container string) (err error) {
 
 	return nil
 }
+
+func (d docker) rm(container string) (err error) {
+	sh := newShell("docker", "rm", container)
+	err = sh.run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
