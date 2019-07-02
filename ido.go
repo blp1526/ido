@@ -7,6 +7,7 @@ import (
 )
 
 func Create(image string) (tempDir string, err error) {
+	// via https://github.com/opencontainers/runc/blob/6cccc1760d57d9e1bc856b96eeb7ee02b7b8101d/README.md#using-runc
 	tempDir, err = ioutil.TempDir("", "")
 	if err != nil {
 		return "", err
@@ -18,6 +19,7 @@ func Create(image string) (tempDir string, err error) {
 	}
 
 	d := newDocker()
+	//
 	container, err := d.create(image)
 	if err != nil {
 		return "", err
@@ -47,6 +49,7 @@ func Create(image string) (tempDir string, err error) {
 }
 
 func Run(dir string, cmd string) error {
+	// via https://ericchiang.github.io/post/containers-from-scratch/#creating-namespaces-with-unshare
 	rootfsDir := filepath.Join(dir, "rootfs")
 	err := unshareChroot(rootfsDir, cmd)
 	if err != nil {
@@ -82,12 +85,26 @@ func tarX(dir string, file string) (err error) {
 }
 
 func unshareChroot(dir string, cmd string) (err error) {
-	sh := newShell("unshare", "--pid", "--fork", "chroot", dir, cmd)
+	procDir := filepath.Join(dir, "proc")
+	// via https://github.com/karelzak/util-linux/issues/648#issuecomment-404066455
+	mount := newShell("mount", "-t", "proc", "proc", procDir)
+	err = mount.run()
+	if err != nil {
+		return err
+	}
+
+	sh := newShell("unshare", "--pid", "--fork", "--mount-proc="+procDir, "chroot", dir, cmd)
 	sh.cmd.Stdout = os.Stdout
 	sh.cmd.Stdin = os.Stdin
 	sh.cmd.Stderr = os.Stderr
 
 	err = sh.run()
+	if err != nil {
+		return err
+	}
+
+	umount := newShell("umount", procDir)
+	err = umount.run()
 	if err != nil {
 		return err
 	}
