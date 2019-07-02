@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
 func Create(image string) (tempDir string, err error) {
@@ -47,23 +46,14 @@ func Create(image string) (tempDir string, err error) {
 	return tempDir, nil
 }
 
-func Run(cmd string) error {
-	wd, err := os.Getwd()
+func Run(dir string, cmd string) error {
+	rootfsDir := filepath.Join(dir, "rootfs")
+	err := unshareChroot(rootfsDir, cmd)
 	if err != nil {
 		return err
 	}
 
-	rootfsDir := filepath.Join(wd, "rootfs")
-	err = unshareChroot(rootfsDir, cmd)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Attach(pid string) error {
-	_, err := strconv.Atoi(pid)
+	err = os.RemoveAll(dir)
 	if err != nil {
 		return err
 	}
