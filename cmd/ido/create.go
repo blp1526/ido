@@ -9,7 +9,7 @@ import (
 
 var createCommand = cli.Command{
 	Name:      "create",
-	Usage:     "creates a container",
+	Usage:     "Creates an image directory",
 	ArgsUsage: "[image]",
 	Action: func(c *cli.Context) (err error) {
 		image := c.Args().First()

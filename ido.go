@@ -19,7 +19,6 @@ func Create(image string) (tempDir string, err error) {
 	}
 
 	d := newDocker()
-	//
 	container, err := d.create(image)
 	if err != nil {
 		return "", err
@@ -30,6 +29,7 @@ func Create(image string) (tempDir string, err error) {
 	if err != nil {
 		return "", err
 	}
+
 	err = d.rm(container)
 	if err != nil {
 		return "", err
@@ -56,11 +56,6 @@ func Run(dir string, cmd string) error {
 		return err
 	}
 
-	err = os.RemoveAll(dir)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -76,7 +71,7 @@ func mkRootfsDir(dir string) (rootfsDir string, err error) {
 
 func tarX(dir string, file string) (err error) {
 	sh := newShell("tar", "-C", dir, "-xvf", file)
-	err = sh.run()
+	_, err = sh.result()
 	if err != nil {
 		return err
 	}
@@ -87,24 +82,16 @@ func tarX(dir string, file string) (err error) {
 func unshareChroot(dir string, cmd string) (err error) {
 	procDir := filepath.Join(dir, "proc")
 	// via https://github.com/karelzak/util-linux/issues/648#issuecomment-404066455
-	mount := newShell("mount", "-t", "proc", "proc", procDir)
-	err = mount.run()
+	mount := newShell("mount", "--types", "proc", "proc", procDir)
+	_, err = mount.result()
 	if err != nil {
 		return err
 	}
-
-	sh := newShell("unshare", "--pid", "--fork", "--mount-proc="+procDir, "chroot", dir, cmd)
-	sh.cmd.Stdout = os.Stdout
-	sh.cmd.Stdin = os.Stdin
-	sh.cmd.Stderr = os.Stderr
-
-	err = sh.run()
-	if err != nil {
-		return err
-	}
-
 	umount := newShell("umount", procDir)
-	err = umount.run()
+	defer umount.run() // nolint: errcheck
+
+	uc := newShell("unshare", "--pid", "--fork", "--mount-proc="+procDir, "chroot", dir, cmd)
+	err = uc.run()
 	if err != nil {
 		return err
 	}

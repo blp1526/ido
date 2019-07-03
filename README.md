@@ -6,6 +6,8 @@ A Toy Container
 
 * chroot
 * unshare
+* mount
+* umount
 * tar
 * docker
   * only `docker create`, `docker export` and `docker rm`
@@ -19,5 +21,5 @@ $ make
 ## Usage
 
 ```
-$ sudo ido run busybox:latest /bin/sh
+$ sudo ./bin/ido run busybox:latest /bin/sh
 ```
