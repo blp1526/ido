@@ -28,7 +28,7 @@ var runCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, exitCodeNG)
 		}
-		defer os.RemoveAll(dir)
+		defer os.RemoveAll(dir) // nolint: errcheck
 
 		err = ido.Run(dir, command)
 		if err != nil {

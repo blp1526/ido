@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// Create creates an image directory.
 func Create(image string) (tempDir string, err error) {
 	// via https://github.com/opencontainers/runc/blob/6cccc1760d57d9e1bc856b96eeb7ee02b7b8101d/README.md#using-runc
 	tempDir, err = ioutil.TempDir("", "")
@@ -48,6 +49,7 @@ func Create(image string) (tempDir string, err error) {
 	return tempDir, nil
 }
 
+// Run runs a container.
 func Run(dir string, cmd string) error {
 	// via https://ericchiang.github.io/post/containers-from-scratch/#creating-namespaces-with-unshare
 	rootfsDir := filepath.Join(dir, "rootfs")
