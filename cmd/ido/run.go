@@ -11,6 +11,12 @@ var runCommand = cli.Command{
 	Name:      "run",
 	Usage:     "Runs a container",
 	ArgsUsage: "[image] [command]",
+	Flags: []cli.Flag{
+		cli.StringSliceFlag{
+			Name:  "volume, v",
+			Usage: "Create a bind mount `HOST-DIR:CONTAINER-DIR`",
+		},
+	},
 	Action: func(c *cli.Context) (err error) {
 		if len(c.Args()) != 2 {
 			err := cli.ShowCommandHelp(c, "run")
@@ -23,6 +29,7 @@ var runCommand = cli.Command{
 
 		image := c.Args()[0]
 		command := c.Args()[1]
+		volumes := c.StringSlice("volume")
 
 		dir, err := ido.Create(image)
 		if err != nil {
@@ -30,7 +37,7 @@ var runCommand = cli.Command{
 		}
 		defer os.RemoveAll(dir) // nolint: errcheck
 
-		err = ido.Run(dir, command)
+		err = ido.Run(dir, command, volumes)
 		if err != nil {
 			return cli.NewExitError(err, exitCodeNG)
 		}

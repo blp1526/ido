@@ -1,9 +1,11 @@
 package ido
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Create creates an image directory.
@@ -50,9 +52,35 @@ func Create(image string) (tempDir string, err error) {
 }
 
 // Run runs a container.
-func Run(dir string, cmd string) error {
+func Run(dir string, cmd string, volumes []string) error {
 	// via https://ericchiang.github.io/post/containers-from-scratch/#creating-namespaces-with-unshare
 	rootfsDir := filepath.Join(dir, "rootfs")
+	for _, volume := range volumes {
+		vDirs := strings.SplitN(volume, ":", 2)
+		if len(vDirs) != 2 {
+			return fmt.Errorf("inavlid volume: %s", volume)
+		}
+
+		hostDir, err := filepath.Abs(vDirs[0])
+		if err != nil {
+			return err
+		}
+
+		containerDir := filepath.Join(rootfsDir, vDirs[1])
+		err = os.MkdirAll(containerDir, 0777)
+		if err != nil {
+			return err
+		}
+
+		mount := newShell("mount", "--bind", "-o", "ro", hostDir, containerDir)
+		_, err = mount.result()
+		if err != nil {
+			return err
+		}
+		umount := newShell("umount", containerDir)
+		defer umount.run() // nolint: errcheck
+	}
+
 	err := unshareChroot(rootfsDir, cmd)
 	if err != nil {
 		return err
