@@ -1,3 +1,4 @@
+// Package ido implements containers operation.
 package ido
 
 import (
