@@ -11,6 +11,7 @@ func newDocker() *docker {
 func (d docker) create(image string) (container string, err error) {
 	sh := newShell("docker", "create", image)
 	result, err := sh.result()
+
 	if err != nil {
 		return "", err
 	}
@@ -27,13 +28,13 @@ func (d docker) create(image string) (container string, err error) {
 
 	lines := strings.Split(result, "\n")
 	container = lines[len(lines)-1]
+
 	return container, nil
 }
 
 func (d docker) export(outputDir string, container string) (err error) {
 	sh := newShell("docker", "export", "-o", outputDir, container)
-	_, err = sh.result()
-	if err != nil {
+	if _, err = sh.result(); err != nil {
 		return err
 	}
 
@@ -42,8 +43,7 @@ func (d docker) export(outputDir string, container string) (err error) {
 
 func (d docker) rm(container string) (err error) {
 	sh := newShell("docker", "rm", container)
-	_, err = sh.result()
-	if err != nil {
+	if _, err = sh.result(); err != nil {
 		return err
 	}
 

@@ -14,6 +14,7 @@ type shell struct {
 
 func newShell(name string, arg ...string) *shell {
 	s := append([]string{name}, arg[0:]...)
+
 	return &shell{
 		line: strings.Join(s, " "),
 		cmd:  exec.Command(name, arg...),
@@ -36,6 +37,7 @@ func (sh *shell) run() error {
 func (sh *shell) result() (result string, err error) {
 	b, err := sh.cmd.CombinedOutput()
 	result = strings.TrimSpace(string(b))
+
 	if err != nil {
 		return "", fmt.Errorf("[%s] %s", sh.line, result)
 	}
