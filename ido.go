@@ -24,28 +24,25 @@ func Create(image string) (tempDir string, err error) {
 
 	d := newDocker()
 	container, err := d.create(image)
+
 	if err != nil {
 		return "", err
 	}
 
 	tempFilePath := filepath.Join(tempDir, "temp.tar")
-	err = d.export(tempFilePath, container)
-	if err != nil {
+	if err = d.export(tempFilePath, container); err != nil {
 		return "", err
 	}
 
-	err = d.rm(container)
-	if err != nil {
+	if err = d.rm(container); err != nil {
 		return "", err
 	}
 
-	err = tarX(rootfsDir, tempFilePath)
-	if err != nil {
+	if err = tarX(rootfsDir, tempFilePath); err != nil {
 		return "", err
 	}
 
-	err = os.Remove(tempFilePath)
-	if err != nil {
+	if err = os.Remove(tempFilePath); err != nil {
 		return "", err
 	}
 
@@ -56,6 +53,7 @@ func Create(image string) (tempDir string, err error) {
 func Run(dir string, cmd string, volumes []string) error {
 	// via https://ericchiang.github.io/post/containers-from-scratch/#creating-namespaces-with-unshare
 	rootfsDir := filepath.Join(dir, "rootfs")
+
 	for _, volume := range volumes {
 		vDirs := strings.SplitN(volume, ":", 2)
 		if len(vDirs) != 2 {
@@ -68,16 +66,15 @@ func Run(dir string, cmd string, volumes []string) error {
 		}
 
 		containerDir := filepath.Join(rootfsDir, vDirs[1])
-		err = os.MkdirAll(containerDir, 0777)
-		if err != nil {
+		if err = os.MkdirAll(containerDir, 0777); err != nil {
 			return err
 		}
 
 		mount := newShell("mount", "--bind", "-o", "ro", hostDir, containerDir)
-		_, err = mount.result()
-		if err != nil {
+		if _, err = mount.result(); err != nil {
 			return err
 		}
+
 		umount := newShell("umount", containerDir)
 		defer umount.run() // nolint: errcheck
 	}
@@ -92,8 +89,7 @@ func Run(dir string, cmd string, volumes []string) error {
 
 func mkRootfsDir(dir string) (rootfsDir string, err error) {
 	rootfsDir = filepath.Join(dir, "rootfs")
-	err = os.Mkdir(rootfsDir, 0755)
-	if err != nil {
+	if err = os.Mkdir(rootfsDir, 0755); err != nil {
 		return "", err
 	}
 
@@ -102,8 +98,7 @@ func mkRootfsDir(dir string) (rootfsDir string, err error) {
 
 func tarX(dir string, file string) (err error) {
 	sh := newShell("tar", "-C", dir, "-xvf", file)
-	_, err = sh.result()
-	if err != nil {
+	if _, err = sh.result(); err != nil {
 		return err
 	}
 
@@ -114,16 +109,15 @@ func unshareChroot(dir string, cmd string) (err error) {
 	procDir := filepath.Join(dir, "proc")
 	// via https://github.com/karelzak/util-linux/issues/648#issuecomment-404066455
 	mount := newShell("mount", "--types", "proc", "proc", procDir)
-	_, err = mount.result()
-	if err != nil {
+	if _, err = mount.result(); err != nil {
 		return err
 	}
+
 	umount := newShell("umount", procDir)
 	defer umount.run() // nolint: errcheck
 
 	uc := newShell("unshare", "--pid", "--fork", "--mount-proc="+procDir, "chroot", dir, cmd)
-	err = uc.run()
-	if err != nil {
+	if err = uc.run(); err != nil {
 		return err
 	}
 
