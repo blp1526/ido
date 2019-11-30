@@ -66,7 +66,7 @@ func Run(dir string, cmd string, volumes []string) error {
 		}
 
 		containerDir := filepath.Join(rootfsDir, vDirs[1])
-		if err = os.MkdirAll(containerDir, 0777); err != nil {
+		if err = os.MkdirAll(containerDir, 0750); err != nil {
 			return err
 		}
 
@@ -89,7 +89,7 @@ func Run(dir string, cmd string, volumes []string) error {
 
 func mkRootfsDir(dir string) (rootfsDir string, err error) {
 	rootfsDir = filepath.Join(dir, "rootfs")
-	if err = os.Mkdir(rootfsDir, 0755); err != nil {
+	if err = os.Mkdir(rootfsDir, 0750); err != nil {
 		return "", err
 	}
 
