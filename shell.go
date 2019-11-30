@@ -17,7 +17,7 @@ func newShell(name string, arg ...string) *shell {
 
 	return &shell{
 		line: strings.Join(s, " "),
-		cmd:  exec.Command(name, arg...),
+		cmd:  exec.Command(name, arg...), // nolint: gosec
 	}
 }
 
