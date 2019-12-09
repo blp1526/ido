@@ -5,32 +5,31 @@ import (
 	"os"
 
 	"github.com/blp1526/ido"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 const exitCodeNG = 1
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "ido"
-	app.Version = ido.Version()
-	app.Usage = ""
-	app.Description = fmt.Sprintf("REVISION: %s", ido.Revision())
-	app.Authors = []cli.Author{
-		{
-			Name:  "Shingo Kawamura",
-			Email: "blp1526@gmail.com",
+	app := &cli.App{
+		Name:        "ido",
+		Version:     ido.Version(),
+		Usage:       "",
+		Description: fmt.Sprintf("REVISION: %s", ido.Revision()),
+		Authors: []*cli.Author{
+			{
+				Name:  "Shingo Kawamura",
+				Email: "blp1526@gmail.com",
+			},
+		},
+		Copyright: "(c) 2019 Shingo Kawamura",
+		Commands: []*cli.Command{
+			createCommand,
+			runCommand,
 		},
 	}
-	app.Copyright = "(c) 2019 Shingo Kawamura"
 
-	app.Commands = []cli.Command{
-		createCommand,
-		runCommand,
-	}
-
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		panic(err)
 	}
 }
