@@ -12,14 +12,20 @@ clean:
 	rm -rf bin/
 	@echo
 
-.PHONY: dep
-dep:
+.PHONY: mod
+mod:
 	go mod tidy
+	go get github.com/editorconfig-checker/editorconfig-checker/cmd/editorconfig-checker
 	go get github.com/golangci/golangci-lint/cmd/golangci-lint
 	@echo
 
+.PHONY: editorconfig
+editorconfig: mod
+	./bin/editorconfig-checker
+	@echo
+
 .PHONY: lint
-lint: dep
+lint: editorconfig
 	./bin/golangci-lint run ./...
 	@echo
 
